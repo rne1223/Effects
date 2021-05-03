@@ -1,0 +1,244 @@
+{
+	Tools = ordered() {
+		Shaker = GroupOperator {
+			CtrlWZoom = false,
+			Inputs = ordered() {
+				Input2 = InstanceInput {
+					SourceOp = "CameraShake_1",
+					Source = "YDeviation",
+				},
+				Input3 = InstanceInput {
+					SourceOp = "CameraShake_1",
+					Source = "RotationDeviation",
+				},
+				Input4 = InstanceInput {
+					SourceOp = "CameraShake_1",
+					Source = "Edges",
+				},
+				Input5 = InstanceInput {
+					SourceOp = "CameraShake_1",
+					Source = "MotionBlur",
+				},
+				Input6 = InstanceInput {
+					SourceOp = "CameraShake_1",
+					Source = "Quality",
+				},
+				Input7 = InstanceInput {
+					SourceOp = "CameraShake_1",
+					Source = "ShutterAngle",
+				},
+				MainInput1 = InstanceInput {
+					SourceOp = "Transform1_1",
+					Source = "Input",
+				},
+				AdvanceConfig = Input { Value = 0, 
+				},
+				Input1 = InstanceInput {
+					SourceOp = "CameraShake_1",
+					Source = "XDeviation",
+				}
+			},
+			Outputs = {
+				MainOutput1 = InstanceOutput {
+					SourceOp = "CameraShake_1",
+					Source = "Output",
+				}
+			},
+			ViewInfo = GroupInfo { Pos = { 110, 82.5 } },
+			Tools = ordered() {
+				CameraShake_1 = CameraShake {
+					CtrlWShown = false,
+					NameSet = true,
+					Inputs = {
+						MotionBlur = Input { Value = 1, },
+						Quality = Input { Value = 4, },
+						ShutterAngle = Input { Value = 280, },
+						XDeviation = Input { Value = 1, },
+						YDeviation = Input { Value = 1, },
+						RotationDeviation = Input { Value = 1, },
+						Randomness = Input { Value = 1, },
+						OverallStrength = Input {
+							SourceOp = "AnimCurve_1",
+							Source = "Value",
+						},
+						Speed = Input { Value = 1, },
+						FilterMethod = Input { Value = 4, },
+						Edges = Input { Value = 3, },
+						InvertTransform = Input { Value = 1, },
+						Input = Input {
+							SourceOp = "Transform1_1",
+							Source = "Output",
+						},
+					},
+					ViewInfo = OperatorInfo { Pos = { 55, 8.75758 } },
+				},
+				AnimCurve_1 = LUTLookup {
+					CtrlWZoom = false,
+					NameSet = true,
+					Inputs = {
+						Source = Input { Value = FuID { "Duration" }, },
+						Input = Input { Value = 0.123, },
+						Curve = Input { Value = FuID { "Easing" }, },
+						EaseOut = Input { Value = FuID { "Expo" }, },
+						Lookup = Input {
+							SourceOp = "AnimCurve_1Lookup",
+							Source = "Value",
+						},
+						Scale = Input {
+							Value = -1,
+							Expression = "-Offset",
+						},
+						Offset = Input { Value = 1, },
+						TimeScale = Input {
+							Value = 5,
+							Expression = "10/(Shaker.ShakeStrength+.01)",
+						},
+					},
+				},
+				AnimCurve_1Lookup = LUTBezier {
+					KeyColorSplines = {
+						[0] = {
+							[0] = { 0, RH = { 0.333333333333333, 0.333333333333333 }, Flags = { Linear = true } },
+							[1] = { 1, LH = { 0.666666666666667, 0.666666666666667 }, Flags = { Linear = true } }
+						}
+					},
+					SplineColor = { Red = 255, Green = 255, Blue = 255 },
+				},
+				Transform1_1 = Transform {
+					CtrlWZoom = false,
+					CtrlWShown = false,
+					Inputs = {
+						Edges = Input {
+							Value = 3,
+							Expression = "CameraShake_1.Edges",
+						},
+					},
+					ViewInfo = OperatorInfo { Pos = { -55, 8.75758 } },
+				}
+			},
+			UserControls = ordered() {
+				ShakeStrength = {
+					LINKS_Name = "Shake Strength",
+					LINKID_DataType = "Number",
+					INPID_InputControl = "SliderControl",
+					INP_Default = 5,
+					INP_Integer = false,
+					INP_MinScale = 1,
+					INP_MaxScale = 10,
+					INP_MinAllowed = 0,
+					INP_MaxAllowed = 10,
+					IC_Steps = 1,
+					ICS_ControlPage = "Controls"
+				},
+				AdvanceConfig = {
+					LINKS_Name = "Advance Config",
+					LINKID_DataType = "Number",
+					INPID_InputControl = "LabelControl",
+					INP_Integer = false,
+					INP_Default = 0,
+					INP_MinScale = 0,
+					INP_MaxScale = 1,
+					LBLC_DropDownButton = true,
+					LBLC_NumInputs = 8,
+					LBLC_NestLevel = 8,
+					ICS_ControlPage = "Controls",
+					INP_External = false
+				},
+				Input1 = {
+					LINKS_Name = "Horizontal Movement",
+					LINKID_DataType = "Number",
+					INPID_InputControl = "SliderControl",
+					INP_Default = 1,
+					INP_Integer = false,
+					INP_MinScale = 0,
+					INP_MaxScale = 1,
+					INP_MinAllowed = 0,
+					INP_MaxAllowed = 1,
+					ICS_ControlPage = "Controls"
+				},
+				Input2 = {
+					LINKS_Name = "Vertical Movement",
+					LINKID_DataType = "Number",
+					INPID_InputControl = "SliderControl",
+					INP_Default = 1,
+					INP_Integer = false,
+					INP_MinScale = 0,
+					INP_MaxScale = 1,
+					INP_MinAllowed = 0,
+					INP_MaxAllowed = 1,
+					ICS_ControlPage = "Controls"
+				},
+				Input3 = {
+					LINKS_Name = "Rotation",
+					LINKID_DataType = "Number",
+					INPID_InputControl = "SliderControl",
+					INP_Default = 1,
+					INP_Integer = false,
+					INP_MinScale = 0,
+					INP_MaxScale = 1,
+					INP_MinAllowed = 0,
+					INP_MaxAllowed = 1,
+					ICS_ControlPage = "Controls"
+				},
+				Input4 = {
+					LINKS_Name = "Edges",
+					LINKID_DataType = "Number",
+					INPID_InputControl = "MultiButtonControl",
+					INP_Default = 3,
+					INP_Integer = false,
+					INP_MinScale = 0,
+					INP_MaxScale = 1,
+					INP_MinAllowed = -1000000,
+					INP_MaxAllowed = 1000000,
+					{ MBTNC_AddButton = "Canvas" },
+					{ MBTNC_AddButton = "Wrap" },
+					{ MBTNC_AddButton = "Duplicate" },
+					{ MBTNC_AddButton = "Mirror" },
+					MBTNC_ShowBasicButton = false,
+					MBTNC_ShowToolTip = false,
+					MBTNC_ShowName = false,
+					MBTNC_StretchToFit = true,
+					ICS_ControlPage = "Controls"
+				},
+				Input5 = {
+					LINKS_Name = "Motion Blur",
+					LINKID_DataType = "Number",
+					INPID_InputControl = "CheckboxControl",
+					INP_Default = 1,
+					INP_Integer = true,
+					INP_MinScale = 0,
+					INP_MaxScale = 1,
+					INP_MinAllowed = -1000000,
+					INP_MaxAllowed = 1000000,
+					CBC_TriState = false,
+					ICS_ControlPage = "Controls"
+				},
+				Input6 = {
+					LINKS_Name = "Quality",
+					LINKID_DataType = "Number",
+					INPID_InputControl = "SliderControl",
+					INP_Default = 4,
+					INP_Integer = true,
+					INP_MinScale = 0,
+					INP_MaxScale = 10,
+					INP_MinAllowed = 0,
+					INP_MaxAllowed = 1000000,
+					ICS_ControlPage = "Controls"
+				},
+				Input7 = {
+					LINKS_Name = "Shutter Angle",
+					LINKID_DataType = "Number",
+					INPID_InputControl = "SliderControl",
+					INP_Default = 280,
+					INP_Integer = false,
+					INP_MinScale = 0,
+					INP_MaxScale = 360,
+					INP_MinAllowed = 0,
+					INP_MaxAllowed = 1000000,
+					ICS_ControlPage = "Controls"
+				},
+			}
+		}
+	},
+	ActiveTool = "Shaker"
+}

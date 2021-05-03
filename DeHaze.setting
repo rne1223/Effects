@@ -1,0 +1,307 @@
+{
+	Tools = ordered() {
+		DeHaze = GroupOperator {
+			CtrlWZoom = false,
+			NameSet = true,
+			Inputs = ordered() {
+				Input1 = InstanceInput {
+					SourceOp = "DeHazeIn",
+					Source = "Input",
+				}
+			},
+			Outputs = {
+				Output1 = InstanceOutput {
+					SourceOp = "DeHazeOut",
+					Source = "Output",
+				}
+			},
+			ViewInfo = GroupInfo { Pos = { 495, 82.5 } },
+			Tools = ordered() {
+				DeHazeOut = ChangeDepth {
+					CtrlWZoom = false,
+					CtrlWShown = false,
+					NameSet = true,
+					Inputs = {
+						Depth = Input {
+							Value = 1,
+							Expression = "DeHazeIn.Input.Depth-4",
+						},
+						Input = Input {
+							SourceOp = "ChannelBooleans2",
+							Source = "Output",
+						},
+					},
+					ViewInfo = OperatorInfo { Pos = { 247, 470.758 } },
+				},
+				plus_one = BrightnessContrast {
+					CtrlWShown = false,
+					NameSet = true,
+					Inputs = {
+						Brightness = Input { Value = 1, },
+						Input = Input {
+							SourceOp = "multiply",
+							Source = "Output",
+						},
+					},
+					ViewInfo = OperatorInfo { Pos = { 247, 404.758 } },
+				},
+				PipeRouter1 = PipeRouter {
+					CtrlWShown = false,
+					Inputs = {
+						Input = Input {
+							SourceOp = "DeHazeIn",
+							Source = "Output",
+						},
+					},
+					ViewInfo = PipeRouterInfo { Pos = { 247, 41.7574 } },
+				},
+				dehaze_strength = BrightnessContrast {
+					CtrlWShown = false,
+					NameSet = true,
+					Inputs = {
+						EffectMask = Input {
+							SourceOp = "LumaKeyer1",
+							Source = "Output",
+						},
+						Gamma = Input { Expression = "1+(1-DeHaze.Strength)", },
+						Input = Input {
+							SourceOp = "dehaze_depth",
+							Source = "Output",
+						},
+					},
+					ViewInfo = OperatorInfo { Pos = { -83, 371.758 } },
+				},
+				multiply = ChannelBoolean {
+					CtrlWShown = false,
+					NameSet = true,
+					Inputs = {
+						Operation = Input { Value = 6, },
+						Background = Input {
+							SourceOp = "minus_one",
+							Source = "Output",
+						},
+						Foreground = Input {
+							SourceOp = "Instance_dehaze_depth",
+							Source = "Output",
+						},
+					},
+					ViewInfo = OperatorInfo { Pos = { 247, 371.758 } },
+				},
+				Instance_dehaze_depth = BrightnessContrast {
+					CtrlWShown = false,
+					NameSet = true,
+					SourceOp = "dehaze_depth",
+					Inputs = {
+						StartEndRenderScripts = Input { },
+						EffectMask = Input { },
+						Brightness = Input { Expression = "DeHaze.HazeDepth" },
+						Direction = Input { Value = 1, },
+						Input = Input {
+							SourceOp = "dehaze_strength",
+							Source = "Output",
+						},
+					},
+					ViewInfo = OperatorInfo { Pos = { 27, 371.758 } },
+				},
+				minus_one = BrightnessContrast {
+					CtrlWShown = false,
+					NameSet = true,
+					Inputs = {
+						Brightness = Input { Value = -1, },
+						Input = Input {
+							SourceOp = "PipeRouter1",
+							Source = "Output",
+						},
+					},
+					ViewInfo = OperatorInfo { Pos = { 247, 338.758 } },
+				},
+				LumaKeyer1 = LumaKeyer {
+					CtrlWShown = false,
+					Inputs = {
+						Low = Input { Value = 1, },
+						Input = Input {
+							SourceOp = "dehaze_depth",
+							Source = "Output",
+						},
+					},
+					ViewInfo = OperatorInfo { Pos = { -28, 338.758 } },
+				},
+				dehaze_depth = BrightnessContrast {
+					CtrlWShown = false,
+					NameSet = true,
+					Inputs = {
+						Brightness = Input { Expression = "DeHaze.HazeDepth", },
+						Input = Input {
+							SourceOp = "divide",
+							Source = "Output",
+						},
+					},
+					ViewInfo = OperatorInfo { Pos = { -138, 305.758 } },
+				},
+				white = ChannelBoolean {
+					CtrlWShown = false,
+					NameSet = true,
+					Inputs = {
+						ToRed = Input { Value = 16, },
+						ToGreen = Input { Value = 16, },
+						ToBlue = Input { Value = 16, },
+						ToAlpha = Input { Value = 16, },
+						Background = Input {
+							SourceOp = "desaturate",
+							Source = "Output",
+						},
+					},
+					ViewInfo = OperatorInfo { Pos = { -248, 239.758 } },
+				},
+				divide = ChannelBoolean {
+					CtrlWShown = false,
+					NameSet = true,
+					Inputs = {
+						Operation = Input { Value = 7, },
+						Background = Input {
+							SourceOp = "white",
+							Source = "Output",
+						},
+						Foreground = Input {
+							SourceOp = "despot_black_1",
+							Source = "Output",
+						},
+					},
+					ViewInfo = OperatorInfo { Pos = { -138, 239.758 } },
+				},
+				despot_black_1 = ErodeDilate {
+					CtrlWShown = false,
+					NameSet = true,
+					Inputs = {
+						Filter = Input { Value = 1, },
+						XAmount = Input { Expression = "-despot_black.XAmount", },
+						Input = Input {
+							SourceOp = "despot_black",
+							Source = "Output",
+						},
+					},
+					ViewInfo = OperatorInfo { Pos = { -138, 206.758 } },
+				},
+				despot_black = ErodeDilate {
+					CtrlWShown = false,
+					NameSet = true,
+					Inputs = {
+						Filter = Input { Value = 2, },
+						XAmount = Input { Expression = "DeHaze.RestoreWhites/100", },
+						Input = Input {
+							SourceOp = "desaturate",
+							Source = "Output",
+						},
+					},
+					ViewInfo = OperatorInfo { Pos = { -138, 173.758 } },
+				},
+				desaturate = BrightnessContrast {
+					CtrlWShown = false,
+					NameSet = true,
+					Inputs = {
+						Saturation = Input { Value = 0, },
+						Input = Input {
+							SourceOp = "invert",
+							Source = "Output",
+						},
+					},
+					ViewInfo = OperatorInfo { Pos = { -193, 107.758 } },
+				},
+				invert = ChannelBoolean {
+					CtrlWShown = false,
+					NameSet = true,
+					Inputs = {
+						Operation = Input { Value = 10, },
+						Background = Input {
+							SourceOp = "dehaze_max_define",
+							Source = "Output",
+						},
+					},
+					ViewInfo = OperatorInfo { Pos = { -193, 74.7574 } },
+				},
+				dehaze_max_define = BrightnessContrast {
+					CtrlWShown = false,
+					NameSet = true,
+					Inputs = {
+						Gain = Input {
+							Value = 0.850000023841858,
+							Expression = "DeHaze.PresetIntensity",
+						},
+						Input = Input {
+							SourceOp = "DeHazeIn",
+							Source = "Output",
+						},
+					},
+					ViewInfo = OperatorInfo { Pos = { -193, 41.7574 } },
+				},
+				DeHazeIn = ChangeDepth {
+					CtrlWZoom = false,
+					CtrlWShown = false,
+					NameSet = true,
+					Inputs = {
+						Depth = Input {
+							Value = 3,
+							Expression = "self.Input.Depth<8 and 3 or 4",
+						},
+					},
+					ViewInfo = OperatorInfo { Pos = { -193, 8.75735 } },
+				},
+				ChannelBooleans2 = ChannelBoolean {
+					CtrlWShown = false,
+					Inputs = {
+						ToRed = Input { Value = 4, },
+						ToGreen = Input { Value = 4, },
+						ToBlue = Input { Value = 4, },
+						Background = Input {
+							SourceOp = "plus_one",
+							Source = "Output",
+						},
+						Foreground = Input {
+							SourceOp = "DeHazeIn",
+							Source = "Output",
+						},
+					},
+					ViewInfo = OperatorInfo { Pos = { 247, 437.758 } },
+				}
+			},
+			UserControls = ordered() {
+				PresetIntensity = {
+					INP_Integer = false,
+					LINKS_Name = "Preset Intensity",
+					INPID_InputControl = "SliderControl",
+					INP_MinScale = 0,
+					LINKID_DataType = "Number",
+					INP_MaxScale = 1,
+					INP_Default = 0.8,
+				},
+				HazeDepth = {
+					INP_Integer = false,
+					LINKS_Name = "Haze Depth",
+					INPID_InputControl = "SliderControl",
+					INP_MinScale = -1,
+					LINKID_DataType = "Number",
+					INP_MaxScale = 0,
+					INP_Default = 0,
+				},
+				Strength = {
+					INP_Integer = false,
+					INP_Default = 0.8,
+					INPID_InputControl = "SliderControl",
+					INP_MinScale = 0,
+					LINKID_DataType = "Number",
+					INP_MaxScale = 1,
+					LINKS_Name = "Strength",
+				},
+				RestoreWhites = {
+					INP_Integer = false,
+					INP_Default = 0,
+					INPID_InputControl = "SliderControl",
+					INP_MinScale = 0,
+					LINKID_DataType = "Number",
+					INP_MaxScale = 1,
+					LINKS_Name = "Restore Highlights",
+				}
+			}
+		}
+	}
+}

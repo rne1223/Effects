@@ -1,0 +1,315 @@
+{
+	Tools = ordered() {
+		EdgeFinder = GroupOperator {
+			CustomData = {
+				HelpPage = "https://www.steakunderwater.com/wesuckless/viewtopic.php?f=6&t=2206"
+			},
+			CtrlWZoom = false,
+			NameSet = true,
+			Inputs = ordered() {
+				Input = InstanceInput {
+					SourceOp = "BGInput",
+					Source = "Input",
+				},
+				EffectMask = InstanceInput {
+					SourceOp = "CopyAndBlend",
+					Source = "EffectMask",
+				}
+			},
+			Outputs = {
+				Output1 = InstanceOutput {
+					SourceOp = "CopyAndBlend",
+					Source = "Output",
+				}
+			},
+			ViewInfo = GroupInfo {
+				Pos = { 550, 148.5 },
+				Flags = {
+					AllowPan = false,
+					ForceSource = true,
+					GridSnap = true,
+					ConnectedSnap = true,
+					ShowGrid = false,
+					AutoSnap = true,
+					FullIndicator = true,
+					RemoveRouters = true
+				},
+				Size = { 963, 203.3, 228, 66 },
+				Direction = "Horizontal",
+				PipeStyle = "Direct",
+				Scale = 1,
+				Offset = { -825, -38.8 }
+			},
+			Tools = ordered() {
+				OutputCrop = Crop {
+					CtrlWShown = false,
+					NameSet = true,
+					Inputs = {
+						XOffset = Input { Value = 5, },
+						YOffset = Input { Value = 5, },
+						XSize = Input {
+							Value = 1544,
+							Expression = "InputCrop.Input.Width",
+						},
+						YSize = Input {
+							Value = 1012,
+							Expression = "InputCrop.Input.Height",
+						},
+						Input = Input {
+							SourceOp = "BlurEdges",
+							Source = "Output",
+						},
+						ClippingMode = Input { Value = FuID { "None" }, },
+					},
+					ViewInfo = OperatorInfo { Pos = { 1375, 82.5 } },
+				},
+				EdgeDetect = Filter {
+					CtrlWShown = false,
+					NameSet = true,
+					Inputs = {
+						FilterType = Input {
+							Value = 3,
+							Expression = "EdgeFinder.Filter+3",
+						},
+						Red = Input { Expression = "EdgeFinder.Red", },
+						Green = Input { Expression = "EdgeFinder.Green", },
+						Blue = Input { Expression = "EdgeFinder.Blue", },
+						Alpha = Input { Expression = "EdgeFinder.Alpha", },
+						Input = Input {
+							SourceOp = "DupeEdges",
+							Source = "Output",
+						},
+					},
+					ViewInfo = OperatorInfo { Pos = { 880, 115.5 } },
+				},
+				DupeEdges = Transform {
+					CtrlWShown = false,
+					NameSet = true,
+					Inputs = {
+						UseSizeAndAspect = Input { Value = 0, },
+						Edges = Input {
+							Value = 2,
+							Expression = "EdgeFinder.ExcludeImageEdges==1 and 2 or 0",
+						},
+						Input = Input {
+							SourceOp = "InputCrop",
+							Source = "Output",
+						},
+					},
+					ViewInfo = OperatorInfo { Pos = { 770, 115.5 } },
+				},
+				InputCrop = Crop {
+					CtrlWShown = false,
+					NameSet = true,
+					Inputs = {
+						XOffset = Input { Value = -5, },
+						YOffset = Input { Value = -5, },
+						XSize = Input {
+							Value = 1554,
+							Expression = "InputCrop.Input.Width+10",
+						},
+						YSize = Input {
+							Value = 1022,
+							Expression = "InputCrop.Input.Height+10",
+						},
+						Input = Input {
+							SourceOp = "BGInput",
+							Source = "Output",
+						},
+					},
+					ViewInfo = OperatorInfo { Pos = { 715, 82.5 } },
+				},
+				ErodeDilateEdges = ErodeDilate {
+					CtrlWShown = false,
+					NameSet = true,
+					Inputs = {
+						XAmount = Input { Expression = "EdgeFinder.ErodeDilate", },
+						ClippingMode = Input { Expression = "EdgeFinder.ClippingMode", },
+						Input = Input {
+							SourceOp = "CopyDomain",
+							Source = "Output",
+						},
+					},
+					ViewInfo = OperatorInfo { Pos = { 1155, 82.5 } },
+				},
+				BlurEdges = Blur {
+					CtrlWShown = false,
+					NameSet = true,
+					Inputs = {
+						XBlurSize = Input {
+							Value = 0,
+							Expression = "EdgeFinder.Blur",
+						},
+						ClippingMode = Input { Expression = "EdgeFinder.ClippingMode", },
+						Input = Input {
+							SourceOp = "ErodeDilateEdges",
+							Source = "Output",
+						},
+					},
+					ViewInfo = OperatorInfo { Pos = { 1265, 82.5 } },
+				},
+				CopyDomain = SetDomain {
+					CtrlWShown = false,
+					NameSet = true,
+					Inputs = {
+						Input = Input {
+							SourceOp = "EdgeDetect",
+							Source = "Output",
+						},
+						Foreground = Input {
+							SourceOp = "InputCrop",
+							Source = "Output",
+						},
+					},
+					ViewInfo = OperatorInfo { Pos = { 990, 82.5 } },
+				},
+				CopyAndBlend = ChannelBoolean {
+					CtrlWShown = false,
+					NameSet = true,
+					Inputs = {
+						Blend = Input { Expression = "EdgeFinder.Blend", },
+						ToRed = Input { Expression = "EdgeFinder.EdgeMatteOutput==0 and 0 or EdgeFinder.EdgeMatteOutput==1 and 10 or 5", },
+						ToGreen = Input { Expression = "EdgeFinder.EdgeMatteOutput==0 and 1 or EdgeFinder.EdgeMatteOutput==1 and 10 or 6", },
+						ToBlue = Input { Expression = "EdgeFinder.EdgeMatteOutput==0 and 2 or EdgeFinder.EdgeMatteOutput==1 and 10 or 7", },
+						ToAlpha = Input { Expression = "EdgeFinder.EdgeMatteOutput==0 and 3 or 10", },
+						Background = Input {
+							SourceOp = "BGInput",
+							Source = "Output",
+						},
+						Foreground = Input {
+							SourceOp = "OutputCrop",
+							Source = "Output",
+						},
+					},
+					ViewInfo = OperatorInfo { Pos = { 1430, 49.5 } },
+				},
+				BGInput = PipeRouter {
+					CtrlWShown = false,
+					NameSet = true,
+					ViewInfo = PipeRouterInfo { Pos = { 660, 49.5 } },
+				}
+			},
+			UserControls = ordered() {
+				Filter = {
+					{ CCS_AddString = "Sobel" },
+					{ CCS_AddString = "Lapacian" },
+					INP_Integer = false,
+					ICS_ControlPage = "Controls",
+					LINKID_DataType = "Number",
+					CC_LabelPosition = "Horizontal",
+					INPID_InputControl = "ComboControl",
+					LINKS_Name = "Filter"
+				},
+				Red = {
+					ICD_Width = 0.25,
+					INP_Integer = true,
+					INP_Default = 1,
+					ICS_ControlPage = "Controls",
+					CBC_TriState = false,
+					LINKID_DataType = "Number",
+					INPID_InputControl = "CheckboxControl",
+					LINKS_Name = "Red"
+				},
+				Green = {
+					ICD_Width = 0.25,
+					INP_Integer = true,
+					INP_Default = 1,
+					ICS_ControlPage = "Controls",
+					CBC_TriState = false,
+					LINKID_DataType = "Number",
+					INPID_InputControl = "CheckboxControl",
+					LINKS_Name = "Green"
+				},
+				Blue = {
+					ICD_Width = 0.25,
+					INP_Integer = true,
+					INP_Default = 1,
+					ICS_ControlPage = "Controls",
+					CBC_TriState = false,
+					LINKID_DataType = "Number",
+					INPID_InputControl = "CheckboxControl",
+					LINKS_Name = "Blue"
+				},
+				Alpha = {
+					ICD_Width = 0.25,
+					INP_Integer = true,
+					INP_Default = 1,
+					ICS_ControlPage = "Controls",
+					CBC_TriState = false,
+					LINKID_DataType = "Number",
+					INPID_InputControl = "CheckboxControl",
+					LINKS_Name = "Alpha"
+				},
+				ErodeDilate = {
+					INP_Integer = false,
+					INPID_InputControl = "SliderControl",
+					INP_MaxScale = 0.02,
+					INP_Default = 0,
+					INP_MinScale = -0.002,
+					LINKID_DataType = "Number",
+					ICS_ControlPage = "Controls",
+					ICD_Center = 0,
+					LINKS_Name = "Erode/Dilate"
+				},
+				Blur = {
+					INP_Default = 0,
+					INP_Integer = false,
+					ICS_ControlPage = "Controls",
+					LINKID_DataType = "Number",
+					INP_MinScale = 0,
+					INPID_InputControl = "SliderControl",
+					INP_MaxScale = 100,
+					LINKS_Name = "Blur"
+				},
+				Blend = {
+					INP_Integer = false,
+					LINKID_DataType = "Number",
+					LINKS_Name = "Blend",
+					INPID_InputControl = "SliderControl",
+					ICS_ControlPage = "Controls",
+					INP_Default = 1
+				},
+				ExcludeImageEdges = {
+					CBC_TriState = false,
+					INP_Integer = true,
+					LINKID_DataType = "Number",
+					INP_Default = 1,
+					ICS_ControlPage = "Controls",
+					INPID_InputControl = "CheckboxControl",
+					LINKS_Name = "Exclude Image Edges"
+				},
+				EdgeMatteOutput = {
+					{ MBTNC_AddButton = "R|G|B|A" },
+					{ MBTNC_AddButton = "R=G=B=A" },
+					{ MBTNC_AddButton = "RGB -> A" },
+					INP_Integer = true,
+					INPID_InputControl = "MultiButtonControl",
+					MBTNC_ShowBasicButton = true,
+					INP_Default = 0,
+					ICS_ControlPage = "Controls",
+					LINKID_DataType = "Number",
+					MBTNC_ShowName = true,
+					MBTNC_StretchToFit = true,
+					MBTNC_ShowToolTip = false,
+					LINKS_Name = "Edge Matte Output"
+				},
+				ClippingMode = {
+					{ MBTNC_AddButton = "None" },
+					{ MBTNC_AddButton = "Domain" },
+					{ MBTNC_AddButton = "Frame" },
+					INP_Integer = true,
+					INPID_InputControl = "MultiButtonIDControl",
+					MBTNC_ShowBasicButton = true,
+					INPID_DefaultID = "Frame",
+					ICS_ControlPage = "Controls",
+					LINKID_DataType = "FuID",
+					MBTNC_ShowName = true,
+					MBTNC_StretchToFit = true,
+					MBTNC_ShowToolTip = false,
+					LINKS_Name = "Clipping Mode"
+				}
+			}
+		}
+	},
+	ActiveTool = "EdgeFinder"
+}

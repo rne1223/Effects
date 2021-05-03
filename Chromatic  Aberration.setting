@@ -1,0 +1,177 @@
+{
+	Tools = ordered() {
+		ChromaticAboration = MacroOperator {
+			Inputs = ordered() {
+				Input1 = InstanceInput {
+					SourceOp = "ExpressionxfRed",
+					Source = "n1",
+					MinScale = -1,
+					Default = 0,
+				},
+				MainInput1 = InstanceInput {
+					SourceOp = "Blur1",
+					Source = "Input",
+				},
+				Input2 = InstanceInput {
+					SourceOp = "ExpressionBlur1",
+					Source = "n1",
+					MaxScale = 20,
+					Default = 5,
+				},
+			},
+			Outputs = {
+				MainOutput1 = InstanceOutput {
+					SourceOp = "ChannelBooleans2",
+					Source = "Output",
+				}
+			},
+			ViewInfo = GroupInfo { Pos = { 0, 0 } },
+			Tools = ordered() {
+				ChannelBooleans2 = ChannelBoolean {
+					Inputs = {
+						Operation = Input { Value = 1, },
+						Background = Input {
+							SourceOp = "xfBlue",
+							Source = "Output",
+						},
+						Foreground = Input {
+							SourceOp = "ChannelBooleans1",
+							Source = "Output",
+						},
+					},
+					ViewInfo = OperatorInfo { Pos = { 770, -49.5 } },
+				},
+				ChannelBooleans1 = ChannelBoolean {
+					Inputs = {
+						Operation = Input { Value = 1, },
+						Background = Input {
+							SourceOp = "xfRed",
+							Source = "Output",
+						},
+						Foreground = Input {
+							SourceOp = "xfGreen",
+							Source = "Output",
+						},
+					},
+					ViewInfo = OperatorInfo { Pos = { 660, -49.5 } },
+				},
+				xfGreen = Transform {
+					NameSet = true,
+					Inputs = {
+						Center = Input { Expression = "Point(0.5, xfRed.Center.X)", },
+						Edges = Input { Value = 3, },
+						Input = Input {
+							SourceOp = "Green",
+							Source = "Output",
+						},
+					},
+					ViewInfo = OperatorInfo { Pos = { 495, -16.5 } },
+				},
+				xfRed = Transform {
+					NameSet = true,
+					Inputs = {
+						Center = Input {
+							SourceOp = "ExpressionxfRed",
+							Source = "PointResult",
+						},
+						Edges = Input { Value = 3, },
+						Input = Input {
+							SourceOp = "Red",
+							Source = "Output",
+						},
+					},
+					ViewInfo = OperatorInfo { Pos = { 495, -49.5 } },
+				},
+				ExpressionxfRed = Expression {
+					CtrlWZoom = false,
+					NameSet = true,
+					Inputs = {
+						PointExpressionX = Input { Value = "n1+.5", },
+						PointExpressionY = Input { Value = "p1y", },
+						NumberControls = Input { Value = 1, },
+						NameforNumber1 = Input { Value = "Master Shift", },
+					},
+				},
+				xfBlue = Transform {
+					NameSet = true,
+					Inputs = {
+						Center = Input { Expression = "Point(1-xfRed.Center.X, 0.5)", },
+						Edges = Input { Value = 3, },
+						Input = Input {
+							SourceOp = "Blue",
+							Source = "Output",
+						},
+					},
+					ViewInfo = OperatorInfo { Pos = { 495, 16.5 } },
+				},
+				Green = ChannelBoolean {
+					NameSet = true,
+					Inputs = {
+						ToRed = Input { Value = 15, },
+						ToBlue = Input { Value = 15, },
+						Background = Input {
+							SourceOp = "Blur1",
+							Source = "Output",
+						},
+					},
+					ViewInfo = OperatorInfo { Pos = { 385, -16.5 } },
+				},
+				Red = ChannelBoolean {
+					NameSet = true,
+					Inputs = {
+						ToGreen = Input { Value = 15, },
+						ToBlue = Input { Value = 15, },
+						Background = Input {
+							SourceOp = "Blur1",
+							Source = "Output",
+						},
+					},
+					ViewInfo = OperatorInfo { Pos = { 385, -49.5 } },
+				},
+				Blue = ChannelBoolean {
+					NameSet = true,
+					Inputs = {
+						ToRed = Input { Value = 15, },
+						ToGreen = Input { Value = 15, },
+						Background = Input {
+							SourceOp = "Blur1",
+							Source = "Output",
+						},
+					},
+					ViewInfo = OperatorInfo { Pos = { 385, 16.5 } },
+				},
+				Blur1 = Blur {
+					Inputs = {
+						Filter = Input { Value = FuID { "Fast Gaussian" }, },
+						Green = Input { Value = 0, },
+						XBlurSize = Input {
+							SourceOp = "ExpressionBlur1",
+							Source = "NumberResult",
+						},
+					},
+					ViewInfo = OperatorInfo { Pos = { 220, -16.5 } },
+				},
+				ExpressionBlur1 = Expression {
+					CtrlWZoom = false,
+					NameSet = true,
+					Inputs = {
+						n1 = Input { Value = 5, },
+						n2 = Input {
+							Value = 0.735294117647059,
+							Expression = "xfRed.Center.X",
+						},
+						NumberExpression = Input { Value = "abs(n2-0.5)*n1*10", },
+						NumberControls = Input { Value = 1, },
+						NameforNumber1 = Input { Value = "Blur Amount", },
+						NameforNumber2 = Input { Value = "Red Shift", },
+					},
+				},
+				Left = AudioDisplay {
+				},
+				Right = AudioDisplay {
+				}
+			},
+		}
+	},
+	ActiveTool = "ChromaticAboration"
+}
